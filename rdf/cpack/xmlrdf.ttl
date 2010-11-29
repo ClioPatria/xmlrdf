@@ -11,7 +11,7 @@
 # this.  Otherwise you can specify the information inline as done below.
 # See http://xmlns.com/foaf/spec/ for defines fields.
 
-<> a cpack:Package ;
+<> a cpack:Library ;
 	cpack:packageName "xmlrdf" ;
 	dcterms:title "XML to RDF conversion" ;
 	cpack:author [ a foaf:Person ;
@@ -24,7 +24,17 @@
 	    ] ;
 	cpack:description
 
-"""The package description goes here.  You can use PlDoc Wiki markup.
+"""The XML to RDF convertor allows for importing XML as RDF using two steps:
+
+    1. A generic translation from XML to RDF.  This generally needs no
+       configuration but it allows for a few parameters:
+
+	- Define the primary record element
+	- Define the target namespace
+	- Define elements that must be kept as XMLLiteral
+
+    2. Preform a rewrite on the generated graph using a Prolog based
+       rewrite language.
 """ .
 
 
