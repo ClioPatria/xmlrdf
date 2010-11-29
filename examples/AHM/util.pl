@@ -1,15 +1,14 @@
 % Utility predicates for
 
-:- module(util,
+:- module(ahm_util,
 	  [ role_to_property/2,	 	 % +Role, -SubProperty
 	    concat_maybe/2,              % +ListofArgs, -OutputLiteral
 	    concat_maybe/3,              % +ListofArgs, +Separator, -OutputLiteral
 	    object_number_to_url/2,	 % +Object Number -URL
 	    lang_to_langcode/2		 % +AHMLangNr, -IsoLangCode
-
-	    	  ]).
+	  ]).
 :- use_module(library(semweb/rdf_db)).
-:- use_module(xmlrdf(rdf_convert_util)).
+:- use_module(library(xmlrdf/rdf_convert_util)).
 
 
 % Utility preds that make a creator subproperty based on creator Role.

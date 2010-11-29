@@ -5,9 +5,9 @@
 	    list_rules/0
 	  ]).
 :- use_module(library(semweb/rdf_db)).
-:- use_module(xmlrdf(rdf_convert_util)).
-:- use_module(xmlrdf(cvt_vocabulary)).
-:- use_module(xmlrdf(rdf_rewrite)).
+:- use_module(library(xmlrdf/rdf_convert_util)).
+:- use_module(library(xmlrdf/cvt_vocabulary)).
+:- use_module(library(xmlrdf/rdf_rewrite)).
 :- use_module(util).
 
 :- debug(rdf_rewrite).
@@ -385,7 +385,7 @@ webtextcat @@
 
 % clean
 webtextcat @@
-{T,  ahm:'AHMTextsType', BN1},
+{_T,  ahm:'AHMTextsType', BN1},
 {BN1, rdf:type, ahm:'AHMTextsType'}
 <=>
 true.

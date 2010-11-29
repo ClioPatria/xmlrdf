@@ -1,21 +1,13 @@
-:- prolog_load_context(directory, Dir),
-   asserta(user:file_search_path(ahm, Dir)).
-
-user:file_search_path(xmlrdf,     ahm('..')).
-user:file_search_path(data,       ahm('../../AHM')).
-user:file_search_path(cliopatria, ahm('../../ClioPatria')).
-user:file_search_path(getty,      ahm('../../../eculture/RDF/vocabularies/getty')).
-
 :- load_files(library(semweb/rdf_db), [silent(true)]).
 
 :- rdf_register_ns(ahm,	   'http://purl.org/collections/ahm/').
 :- rdf_register_ns(ulan,   'http://e-culture.multimedian.nl/ns/getty/ulan#').
 :- rdf_register_ns(aatned, 'http://e-culture.multimedian.nl/ns/rkd/aatned/').
-:- rdf_register_ns(skos,   'http://www.w3.org/2004/02/skos/core#').
-:- rdf_register_ns(foaf,   'http://xmlns.com/foaf/0.1/').
+
+user:file_search_path(data, '../metadata').
 
 :- load_files([ cliopatria(cliopatria),
-		xmlrdf(xmlrdf),
+		library(xmlrdf/xmlrdf),
 		library(semweb/rdf_cache),
 		library(semweb/rdf_library),
 		library(semweb/rdf_turtle_write)
@@ -23,7 +15,7 @@ user:file_search_path(getty,      ahm('../../../eculture/RDF/vocabularies/getty'
 :- use_module(rewrite).
 
 load_ontologies :-
-	rdf_attach_library(cliopatria(ontologies)),
+	rdf_attach_library(cliopatria(rdf)),
 %	rdf_attach_library(getty(.)),
 	rdf_load_library(dc),
 	rdf_load_library(skos),
@@ -33,17 +25,10 @@ load_ontologies :-
 	rdf_load(Schema).
 
 :- initialization			% run *after* loading this file
-	ensure_dir(cache),
 	rdf_set_cache_options([ global_directory('cache/rdf'),
 				create_global_directory(true)
 			      ]),
 	load_ontologies.
-
-ensure_dir(Dir) :-
-	exists_directory(Dir), !.
-ensure_dir(Dir) :-
-	make_directory(Dir).
-
 
 :- debug(xmlrdf).
 
