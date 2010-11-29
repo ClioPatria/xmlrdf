@@ -1,0 +1,102 @@
+TODO:
+- People thesaurus: use property (Bob)
+-----------------------------------------------------
+
+
+
+
+
+
+
+- For the schema file, I have used the old ahm-schema.ttl file, where vra is replaced by dcterms where possible. Here we use the standard vra-dcterms mapping (http://www.vraweb.org/resources/datastandards/vracore3/categories.html#type)
+
+- URI's are based on ahm:objectnumber as they seem unique (could also have chosen priref)
+
+- acquisitionDate and Method both mapped to dct:provenance
+
+- locat is mapped to dcterms:spatial, which does not really capture the essence
+
+- ahm:reproduction is a view on the data, which might or might not be available on the web. I think it could be an hasView attached to the aggregation
+
+- productionPlace: dct does not have a good property, so dct:descr.
+
+- hasView: is it only for web-dereferencable material?
+
+- What to do with all the typed bnodes?
+
+RULES
+
+- titleTranslation is always the en. translation of the dutch title. As such it is replaced by a dct:title @en. The original Dutch title becomes a ahm:title @nl. This is slightly weird.
+
+- For dimensions, we have bnodes with (almost) always a value.
+
+% For makers, we use the person thesaurus. TODO: make the object point
+% to the person URI if it is in the thesaurus, or to a BNode object if
+% it is not (or add it to the thesaurus). Problematic are two
+% Maker properties that are context dependent, the role and the
+% qualifier. there are instances where both are present. A possible
+% solution is to make a subproperty for each qualifier/role combi. O
+
+- Exhibitions could be modeled as events, using the EDM event model and stored in a (separate) thesaurus. For now, we use bnodes and 'treat them as resources'.
+
+- related Object ->reBN'ify? : er zijn meerdere records, waarbij
+meerdere relatedObjectReference en relatedObjectNotes zijn. Hiervan is
+de structuur niet meer te achterhalen. in the original data there is no
+XML grouping of related_object.references and related_object.notes, so
+we do not reconstruct that.
+
+
+
+NAMES/People
+
+in people.xml:
+- 66937 records
+- all ahm:name s are unique.
+
+in collection-11001-12001.xml:
+- 1000 Proxies
+- 988 Proxies with ahm:maker  (??)
+- 988 ahm:maker bnodes with a ahm:creator value
+- "onbekend"435 "onbekend (glasblazer)"	305"onbekend (glasgraveur)" 90 "onbekend (glasschilder)" 16
+- 142 other
+- 85 distinct
+- all 988 creator fields have a unique match in people.xml
+
+in total 6172 object literals that match one or more people record name
+- 25 different properties (ref1)
+- also locations etc.
+
+
+Association Person:
+in collection-11001-12001.xml: 195 entries, all with unique match in person thes.
+- associationPerson, contentPerson, documentationAuthor, exhibitionOrganiser, reproductionCreators mapped to people name thesaurus
+- contentSubject and associationSubject not mapped to people.: only few hits, clearly not people (paard, libelle..)
+
+Alternative Number
+- Again, I use the bnode reification trick, where the alternativeNumber becomes subproperty of rdfs:label of the bnode
+
+
+
+
+*----------- Mapping to thesaurus.
+
+I have looked at which literals appear as pref/altlabel values
+in the converted thesaurus. There are a large number of properties
+(ref2).
+for now, each property gives rise to one rewrite rule.
+
+
+(ref1): [reproductionCreator,creator,documentationAuthor,exhibitionOrganiser,exhibitionVenue,currentLocation,creatorDateOfDeath,AHMTextsAuthor,documentationTitle,documentationSortyear,alternativeNumberType,exhibitionCatalogueNumber,alternativeNumberInstitution,dimensionValue,creatorDateOfBirth,creditLine,productionPlace,contentMotifGeneral,acquisitionMethod,associationPerson,associationSubject,contentSubject,contentPersonName,acquisitionDate,material]
+
+(ref2): List of metadata properties, whose object literals are the same
+as preflabels of skos concepts. (starred ones are not rewritten)
+
+[acquisitionMethod],[alternativeNumber],[alternativeNumberInstitution],[associationSubject],[contentMotifGeneral],[contentSubject],[creditLine],[currentLocation],[currentLocationFitness],[dimensionNotes],[dimensionPart],[dimensionType],[dimensionUnit],[dimensionValue*],[documentationSortyear*],[documentationTitle],[exhibitionCatalogueNumber*],[exhibitionVenue],[material],[objectCategory],[objectName],[productionDateEnd*],[productionDateStart*],[productionPeriod],[productionPlace],[reproductionFormat*],[reproductionType],[technique],[title]
+
+
+
+
+
+
+
+
