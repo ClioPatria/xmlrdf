@@ -4,7 +4,7 @@
 :- rdf_register_ns(ulan,   'http://e-culture.multimedian.nl/ns/getty/ulan#').
 :- rdf_register_ns(aatned, 'http://e-culture.multimedian.nl/ns/rkd/aatned/').
 
-user:file_search_path(data, '../metadata').
+user:file_search_path(data, '../metadata/AHM').
 
 :- load_files([ cliopatria(cliopatria),
 		library(xmlrdf/xmlrdf),
