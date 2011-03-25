@@ -28,17 +28,10 @@ load_ontologies :-
 
 
 :- initialization			% run *after* loading this file
-	ensure_dir(cache),
 	rdf_set_cache_options([ global_directory('cache/rdf'),
 				create_global_directory(true)
 			      ]),
 	load_ontologies.
-
-ensure_dir(Dir) :-
-	exists_directory(Dir), !.
-ensure_dir(Dir) :-
-	make_directory(Dir).
-
 
 :- debug(xmlrdf).
 
