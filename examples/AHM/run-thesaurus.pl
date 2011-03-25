@@ -24,8 +24,7 @@ load_ontologies :-
 	rdf_load_library(skos),
 	rdf_load_library(rdfs),
 	rdf_load_library(owl),
-	absolute_file_name(data('rdf/am-thesaurus-schema.ttl'), VocSchema, [access(read)]),
-	rdf_load(VocSchema,[graph(thesaurus_schema)]).
+	rdf_load(data('rdf/am-thesaurus-schema.ttl'),[graph(thesaurus_schema)]).
 
 :- initialization			% run *after* loading this file
 	ensure_dir(cache),
