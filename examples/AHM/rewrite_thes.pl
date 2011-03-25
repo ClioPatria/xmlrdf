@@ -5,9 +5,9 @@
 	    list_rules/0
 	  ]).
 :- use_module(library(semweb/rdf_db)).
-:- use_module(xmlrdf(rdf_convert_util)).
-:- use_module(xmlrdf(cvt_vocabulary)).
-:- use_module(xmlrdf(rdf_rewrite)).
+:- use_module(library(xmlrdf/rdf_convert_util)).
+:- use_module(library(xmlrdf/cvt_vocabulary)).
+:- use_module(library(xmlrdf/rdf_rewrite)).
 :- use_module(util).
 
 :- debug(rdf_rewrite).
@@ -50,7 +50,11 @@ list_rules :-
 record_to_concepts @@
 {S, rdf:type, ahm:'Record'}
 <=>
-{S, rdf:type, skos:'Concept'}.
+{S, rdf:type, skos:'Concept'},
+     %	  rdf_current_ns(ahm, Schema),
+     %	{ S, skos:inScheme, Schema }
+	{ S, skos:inScheme, 'http://purl.org/collections/nl/am/AM_ConceptScheme'}.
+
 
 
 
@@ -69,9 +73,9 @@ rdf(NarUri, ahm:term, NarTerm),
 narrower @@
 {S, ahm:narrowerTerm, NarTerm}
 <=>
-literal_to_id(['t00',NarTerm],ahm, NarUri),
+literal_to_id(['t-new_',NarTerm],ahm, NarUri),
 	{NarUri, rdf:type, skos:'Concept'},
-	{NarUri, skos:prefLabel, NarTerm},
+	{NarUri, skos:prefLabel, NarTerm@nl},
 	{S, skos:narrower, NarUri}.
 
 
@@ -86,9 +90,9 @@ rdf(BroadUri, ahm:term, BroadTerm),
 broader @@
 {S, ahm:broaderTerm, BroTerm}
 <=>
-literal_to_id(['t00',BroTerm],ahm, BroUri),
+literal_to_id(['t-new_',BroTerm],ahm, BroUri),
 	{BroUri, rdf:type, skos:'Concept'},
-	{BroUri, skos:prefLabel, BroTerm},
+	{BroUri, skos:prefLabel, BroTerm@nl},
 	{S, skos:broader, BroUri}.
 
 
@@ -103,9 +107,9 @@ rdf(RelUri, ahm:term, RelTerm),
 related @@
 {S, ahm:relatedTerm,RelTerm}
 <=>
-literal_to_id(['t00',RelTerm],ahm, RelUri),
+literal_to_id(['t-new_',RelTerm],ahm, RelUri),
 	{RelUri, rdf:type, skos:'Concept'},
-	{RelUri, skos:prefLabel, RelTerm},
+	{RelUri, skos:prefLabel, RelTerm@nl},
 	{S, skos:related, RelUri}.
 
 
@@ -163,7 +167,7 @@ termtypes_to_uris @@
 <=>
 rdf_is_bnode(TT),
 not(VAL = literal(lang(_,_))),
-	literal_to_id(['tt00',VAL],ahm,TypeUri),
+	literal_to_id(['t-termtype_',VAL],ahm,TypeUri),
 	{TypeUri}.
 
 termtypes_to_uris @@
@@ -178,7 +182,7 @@ use_to_altlabel @@
  <=>
 rdf(UseUri, ahm:term, UseTerm),
 rdf(S, ahm:term, AltLab),
-	{UseUri, skos:altLabel, AltLab}.
+	{UseUri, skos:altLabel, AltLab@nl}.
 
 use_to_altlabel @@
 {_S, ahm:use, _}
@@ -191,7 +195,7 @@ use_to_altlabel @@
 {S, ahm:usedFor, AltLab}
  <=>
    not(rdf(S, skos:altLabel, AltLab)),
-	{S, skos:altLabel, AltLab}.
+	{S, skos:altLabel, AltLab@nl}.
 
 use_to_altlabel @@
 {_, ahm:usedFor, _}
@@ -208,17 +212,17 @@ use_to_altlabel @@
 term_to_label @@
 {S, ahm:term, Term}
  <=>
-{S, skos:prefLabel, Term}.
+{S, skos:prefLabel, Term@nl}.
 
 
 % ----------- URIs ---------
 
 skos_uris @@
 {S, rdf:type, skos:'Concept'},
-{S, ahm:priref, literal(Pri)},
-{S, skos:prefLabel, literal(Term)} \  {S}
+{S, ahm:priref, literal(Pri)}
+\  {S}
 <=>
-literal_to_id(['t',Pri, Term], ahm, URI),
+literal_to_id(['t-',Pri], ahm, URI),
 {URI}.
 
 
@@ -234,6 +238,13 @@ true.
 % all  selected values are "false", can be removed
 remove_selected @@
 {_, ahm:selected, _}
+ <=>
+true.
+
+
+% all things that are type ahm:'Value' can be cleared
+remove_values @@
+{_, rdf:type, ahm:'Value'}
  <=>
 true.
 

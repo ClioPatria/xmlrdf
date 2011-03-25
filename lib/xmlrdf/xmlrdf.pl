@@ -46,8 +46,8 @@
 :- use_module(library(record)).
 :- use_module(library(apply)).
 
-:- use_module(config_available(skos)).
-:- use_module(config_available(foaf)).
+:- use_module(library(skos_schema)).
+:- use_module(library(foaf_schema)).
 
 :- rdf_register_ns(map, 'http://cs.vu.nl/eculture/map/').
 

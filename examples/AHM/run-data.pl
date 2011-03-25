@@ -1,10 +1,14 @@
+:- module(ahm_convert_data,
+	  [ run_metadata/0
+	  ]).
+
+user:file_search_path(data,       metadata('AHM')).
+
 :- load_files(library(semweb/rdf_db), [silent(true)]).
 
-:- rdf_register_ns(ahm,	   'http://purl.org/collections/ahm/').
+:- rdf_register_ns(ahm,	   'http://purl.org/collections/nl/am/').
 :- rdf_register_ns(ulan,   'http://e-culture.multimedian.nl/ns/getty/ulan#').
 :- rdf_register_ns(aatned, 'http://e-culture.multimedian.nl/ns/rkd/aatned/').
-
-user:file_search_path(data, '../metadata/AHM').
 
 :- load_files([ cliopatria(cliopatria),
 		library(xmlrdf/xmlrdf),
@@ -12,23 +16,34 @@ user:file_search_path(data, '../metadata/AHM').
 		library(semweb/rdf_library),
 		library(semweb/rdf_turtle_write)
 	      ], [silent(true)]).
-:- use_module(rewrite).
+:- use_module(rewrite_data).
 
 load_ontologies :-
-	rdf_attach_library(cliopatria(rdf)),
-%	rdf_attach_library(getty(.)),
+	rdf_attach_library(cliopatria(ontologies)),
+
 	rdf_load_library(dc),
 	rdf_load_library(skos),
 	rdf_load_library(rdfs),
 	rdf_load_library(owl),
-	absolute_file_name(data('rdf/ahm-schema.ttl'), Schema, [access(read)]),
-	rdf_load(Schema).
+
+	rdf_load(data('rdf/am-schema.ttl'),[graph(am_schema)]),
+	rdf_load(data('rdf/am-people-rdagr2-schema.ttl'),[graph(am_rda_schema)]),
+	rdf_load(data('rdf/am-thesaurus-schema.ttl'),[graph(am_thesaurus_schema)]),
+	rdf_load(data('rdf/ElementsGr2.rdf'),[graph(arda_elementsGr2)]).
+
 
 :- initialization			% run *after* loading this file
+	ensure_dir(cache),
 	rdf_set_cache_options([ global_directory('cache/rdf'),
 				create_global_directory(true)
 			      ]),
 	load_ontologies.
+
+ensure_dir(Dir) :-
+	exists_directory(Dir), !.
+ensure_dir(Dir) :-
+	make_directory(Dir).
+
 
 :- debug(xmlrdf).
 
@@ -41,24 +56,14 @@ load :-
 	maplist(load, Files).
 
 load_people_bob:-
-        absolute_file_name(data('rdf/persons.ttl'), File,
-			   [ access(read)
-			   ]),
-	rdf_load(File,[graph(peoplebob)]),
-	absolute_file_name(data('rdf/ahm-people-schema.ttl'), FileSchema,
-			   [ access(read)
-			   ]),
-	rdf_load(FileSchema,[graph(peoplebob_schema)]).
+        absolute_file_name(data('rdf/am-people.ttl'), File,
+			   [ access(read)]),
+	rdf_load(File,[graph(peoplebob)]).
 
 load_thesaurus:-
-        absolute_file_name(data('rdf/thesaurus.ttl'), File,
-			   [ access(read)
-			   ]),
-	rdf_load(File,[graph(thesaurus)]),
-	absolute_file_name(data('rdf/ahm-voc-schema.ttl'), FileSchema,
-			   [ access(read)
-			   ]),
-	rdf_load(FileSchema,[graph(thesaurus_schema)]).
+        absolute_file_name(data('rdf/am-thesaurus.ttl'), File,
+			   [ access(read)]),
+	rdf_load(File,[graph(thesaurus)]).
 
 
 load(File) :-
@@ -99,15 +104,20 @@ sample2 :-
 
 
 save :-
-	absolute_file_name(data('rdf/ahm.ttl'), File,
+	absolute_file_name(data('rdf/am-data.ttl'), File,
 			   [ access(write)
 			   ]),
 	rdf_save_turtle(File, [graph(data)]).
 
-run :-
+run_metadata :-
 	load,
 	load_people_bob,
 	load_thesaurus,
 	rewrite,
 	save.
 
+runsample2:-
+        sample2,
+	load_people_bob,
+	load_thesaurus,
+	rewrite.

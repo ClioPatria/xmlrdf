@@ -43,14 +43,13 @@ list_rules :-
 :- discontiguous
 	rdf_mapping_rule/5.
 
-% URI's are based on ahm:objectnumber as they seem unique \
-%(could also have chosen ahm:priref). Here we only make the
+% URI's are based on ahm:priref as they seem unique  Here we only make the
 % proxy, the rest of the EDM triangle is made later
 
 assign_uris @@
-{ S, ahm:objectNumber, ObjectNumber } \
+{S, ahm:priref, literal(Priref)}\
 { S } <=>
-	literal_to_id(['proxy-', ObjectNumber], ahm, URI),
+	literal_to_id(['proxy-', Priref], ahm, URI),
 	{ URI }.
 
 
@@ -176,13 +175,14 @@ rdf(PersonURI, ahm:name, RC),
 rdf(PersonURI, rdf:type, ahm:'Person'),
 {S, ahm:reproductionCreator, PersonURI}.
 
-% Same for exhibitionOrganiser
+% Same for exhibitionOrganiser, but also include the inverse property
 exhibition_organiser @@
 {S, ahm:exhibitionOrganiser, RC}
 <=>
 rdf(PersonURI, ahm:name, RC),
 rdf(PersonURI, rdf:type, ahm:'Person'),
-{S, ahm:exhibitionOrganiser, PersonURI}.
+{S, ahm:exhibitionOrganiser, PersonURI},
+{PersonURI, ahm:wasPresentAt, S}.
 
 
 
@@ -276,10 +276,10 @@ rdf_is_bnode(B),
 % reconstruct that.
 
 related_object_reference @@
-{S, ahm:relatedObjectReference, literal(ObjRef)}
+{Obj, ahm:objectNumber, ON}\
+{S, ahm:relatedObjectReference, ON}
 <=>
-literal_to_id(['proxy-', ObjRef],ahm, ObjURI),
-	{S,ahm:relatedObjectReference, ObjURI}.
+	{S,ahm:relatedObjectReference, Obj}.
 
 % can be removed if already the title of the thing itself
 related_object_title @@
@@ -407,29 +407,34 @@ true.
 /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 The following rules replace a literal value by the thesaurus skos
 concept for a given set of properties. Each property uses a separate
-rule. */
+rule.
+We use literal_text to ensure language-typed literals match untyped ones*/
 
 labelPred(skos:prefLabel).
 labelPred(skos:altLabel).
 
 map_to_thesaurus @@
 {C, rdf:type, skos:'Concept'},
-	{C, P, literal(Lit)}\
+	{C, P, literal(lang(_,Lit))}\
 	{S, ahm:acquisitionMethod, literal(Lit)}
 	<=>
 	labelPred(P),
 	{S, ahm:acquisitionMethod, C}.
 
+literal_text(Text, Text) :- atom(Text), !.
+literal_text(lang(_, Text), Text).
+
 map_to_thesaurus @@
 {C, rdf:type, skos:'Concept'},
-	{C, P, literal(Lit)}\
+	{C, P, literal(lang(_,Lit))}\
 	{S, ahm:alternativeNumberInstitution, literal(Lit)}
 	<=>
 	labelPred(P),
 	{S, ahm:alternativeNumberInstitution, C}.
+
 map_to_thesaurus @@
 {C, rdf:type, skos:'Concept'},
-	{C, P, literal(Lit)}\
+	{C, P, literal(lang(_,Lit))}\
 	{S, ahm:associationSubject, literal(Lit)}
 	<=>
 	labelPred(P),
@@ -437,7 +442,7 @@ map_to_thesaurus @@
 
 map_to_thesaurus @@
 {C, rdf:type, skos:'Concept'},
-	{C, P, literal(Lit)}\
+	{C, P, literal(lang(_,Lit))}\
 	{S, ahm:contentMotifGeneral, literal(Lit)}
 	<=>
 	labelPred(P),
@@ -445,7 +450,7 @@ map_to_thesaurus @@
 
 map_to_thesaurus @@
 {C, rdf:type, skos:'Concept'},
-	{C, P, literal(Lit)}\
+	{C, P, literal(lang(_,Lit))}\
 	{S, ahm:contentSubject, literal(Lit)}
 	<=>
 	labelPred(P),
@@ -462,7 +467,7 @@ map_to_thesaurus @@
 % maybe not this one (is always AHM
 map_to_thesaurus @@
 {C, rdf:type, skos:'Concept'},
-	{C, P, literal(Lit)}\
+	{C, P, literal(lang(_,Lit))}\
 	{S, ahm:creditLine, literal(Lit)}
 	<=>
 	labelPred(P),
@@ -470,7 +475,7 @@ map_to_thesaurus @@
 
 map_to_thesaurus @@
 {C, rdf:type, skos:'Concept'},
-	{C, P, literal(Lit)}\
+	{C, P, literal(lang(_,Lit))}\
 	{S, ahm:currentLocation, literal(Lit)}
 	<=>
 	labelPred(P),
@@ -478,15 +483,16 @@ map_to_thesaurus @@
 
 map_to_thesaurus @@
 {C, rdf:type, skos:'Concept'},
-	{C, P, literal(Lit)}\
+	{C, P, literal(lang(_,Lit))}\
 	{S, ahm:currentLocationFitness, literal(Lit)}
 	<=>
 	labelPred(P),
 	{S, ahm:currentLocationFitness, C}.
 
+% no 10
 map_to_thesaurus @@
 {C, rdf:type, skos:'Concept'},
-	{C, P, literal(Lit)}\
+	{C, P, literal(lang(_,Lit))}\
 	{S, ahm:dimensionNotes, literal(Lit)}
 	<=>
 	labelPred(P),
@@ -494,7 +500,7 @@ map_to_thesaurus @@
 
 map_to_thesaurus @@
 {C, rdf:type, skos:'Concept'},
-	{C, P, literal(Lit)}\
+	{C, P, literal(lang(_,Lit))}\
 	{S, ahm:dimensionPart, literal(Lit)}
 	<=>
 	labelPred(P),
@@ -503,7 +509,7 @@ map_to_thesaurus @@
 
 map_to_thesaurus @@
 {C, rdf:type, skos:'Concept'},
-	{C, P, literal(Lit)}\
+	{C, P, literal(lang(_,Lit))}\
 	{S, ahm:dimensionType, literal(Lit)}
 	<=>
 	labelPred(P),
@@ -519,7 +525,7 @@ map_to_thesaurus @@
 
 map_to_thesaurus @@
 {C, rdf:type, skos:'Concept'},
-	{C, P, literal(Lit)}\
+	{C, P, literal(lang(_,Lit))}\
 	{S, ahm:documentationTitle, literal(Lit)}
 	<=>
 	labelPred(P),
@@ -527,7 +533,7 @@ map_to_thesaurus @@
 
 map_to_thesaurus @@
 {C, rdf:type, skos:'Concept'},
-	{C, P, literal(Lit)}\
+	{C, P, literal(lang(_,Lit))}\
 	{S, ahm:exhibitionVenue, literal(Lit)}
 	<=>
 	labelPred(P),
@@ -535,7 +541,7 @@ map_to_thesaurus @@
 
 map_to_thesaurus @@
 {C, rdf:type, skos:'Concept'},
-	{C, P, literal(Lit)}\
+	{C, P, literal(lang(_,Lit))}\
 	{S, ahm:material, literal(Lit)}
 	<=>
 	labelPred(P),
@@ -543,7 +549,7 @@ map_to_thesaurus @@
 
 map_to_thesaurus @@
 {C, rdf:type, skos:'Concept'},
-	{C, P, literal(Lit)}\
+	{C, P, literal(lang(_,Lit))}\
 	{S, ahm:objectCategory, literal(Lit)}
 	<=>
 	labelPred(P),
@@ -551,7 +557,7 @@ map_to_thesaurus @@
 
 map_to_thesaurus @@
 {C, rdf:type, skos:'Concept'},
-	{C, P, literal(Lit)}\
+	{C, P, literal(lang(_,Lit))}\
 	{S, ahm:objectName, literal(Lit)}
 	<=>
 	labelPred(P),
@@ -559,7 +565,7 @@ map_to_thesaurus @@
 
 map_to_thesaurus @@
 {C, rdf:type, skos:'Concept'},
-	{C, P, literal(Lit)}\
+	{C, P, literal(lang(_,Lit))}\
 	{S, ahm:productionPeriod, literal(Lit)}
 	<=>
 	labelPred(P),
@@ -573,7 +579,7 @@ map_to_thesaurus @@
 
 map_to_thesaurus @@
 {C, rdf:type, skos:'Concept'},
-	{C, P, literal(Lit)}\
+	{C, P, literal(lang(_,Lit))}\
 	{S, ahm:productionPlace, literal(Lit)}
 	<=>
 	labelPred(P),
@@ -581,7 +587,7 @@ map_to_thesaurus @@
 
 map_to_thesaurus @@
 {C, rdf:type, skos:'Concept'},
-	{C, P, literal(Lit)}\
+	{C, P, literal(lang(_,Lit))}\
 	{S, ahm:reproductionType, literal(Lit)}
 	<=>
 	labelPred(P),
@@ -589,7 +595,7 @@ map_to_thesaurus @@
 
 map_to_thesaurus @@
 {C, rdf:type, skos:'Concept'},
-	{C, P, literal(Lit)}\
+	{C, P, literal(lang(_,Lit))}\
 	{S, ahm:technique, literal(Lit)}
 	<=>
 	labelPred(P),
@@ -597,7 +603,7 @@ map_to_thesaurus @@
 
 map_to_thesaurus @@
 {C, rdf:type, skos:'Concept'},
-	{C, P, literal(Lit)}\
+	{C, P, literal(lang(_,Lit))}\
 	{S, ahm:collection, literal(Lit)}
 	<=>
 	labelPred(P),
@@ -625,9 +631,9 @@ with DC attributes for that.
 :- rdf_register_ns(ore,  'http://www.openarchives.org/ore/terms/').
 
 edm @@
-{S, rdf:type, ahm:'Record'},
-{S, ahm:reproduction, Reproduction } ? % reproduction becomes a hasView
-	<=>
+{S, rdf:type, ahm:'Record'}
+%{S, ahm:reproduction, Reproduction } ?
+<=>
 	edm_identifier(S, proxy, aggregation, AggURI),
 	edm_identifier(S, proxy, physical, PhysURI),
 	{ S, rdf:type, ore:'Proxy'},
@@ -636,22 +642,33 @@ edm @@
 	{ S, ore:proxyIn, AggURI },
         { S, ore:proxyFor, PhysURI },
 	{ AggURI, ore:aggregates, PhysURI },
-	{ AggURI, ens:aggregatedCHO, PhysURI },
-	{ AggURI, ens:hasView, Reproduction }.
+	{ AggURI, ens:aggregatedCHO, PhysURI }.
+%	{ AggURI, ahm:reproduction, Reproduction }.
 
 
 % ------------- Thumbnails -------------
 % This guesses the thumbnail uri, based on the object number
-%
+
 get_thumbnails @@
+{ S, rdf:type, ore:'Proxy'},
 {S, ahm:objectNumber, literal(ON)}
 ==>
 	edm_identifier(S, proxy, aggregation, AggURI),
 	object_number_to_url(ON, URL),
-   { AggURI, ens:hasThumbnail, URL },	   % create new property with link to the ens:WebResource
+   { AggURI, ens:object, URL },	   % used to be hasThumbnail
    { URL, rdf:type, ens:'WebResource' }.
 
+% ------------- Landing page  -------------
+% This guesses the landingpage uri, based on the priref
 
+get_landingpage @@
+{ S, rdf:type, ore:'Proxy'},
+{S, ahm:priref, literal(ON)}
+==>
+	edm_identifier(S, proxy, aggregation, AggURI),
+	atom_concat('http://collectie.ahm.nl/dispatcher.aspx?action=detail&database=ChoiceCollect&priref=',ON, URL),
+   { AggURI, ens:landingPage, URL },
+   { URL, rdf:type, ens:'WebResource' }.
 
 
 

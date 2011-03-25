@@ -1,31 +1,32 @@
-:- module(ahm_thesaurus,
-	  [ run_thesaurus/0
+:- module(ahm_convert_people,
+	  [ run_people/0
 	  ]).
 
 user:file_search_path(data,       metadata('AHM')).
 
-:- use_module(library(semweb/rdf_db)).
+:- load_files(library(semweb/rdf_db), [silent(true)]).
 
 :- rdf_register_ns(ahm,	   'http://purl.org/collections/nl/am/').
 :- rdf_register_ns(ulan,   'http://e-culture.multimedian.nl/ns/getty/ulan#').
 :- rdf_register_ns(aatned, 'http://e-culture.multimedian.nl/ns/rkd/aatned/').
+:- rdf_register_ns(skos,   'http://www.w3.org/2004/02/skos/core#').
+:- rdf_register_ns(foaf,   'http://xmlns.com/foaf/0.1/').
 
-:- use_module([ cliopatria(cliopatria),
+:- load_files([ cliopatria(cliopatria),
 		library(xmlrdf/xmlrdf),
 		library(semweb/rdf_cache),
 		library(semweb/rdf_library),
 		library(semweb/rdf_turtle_write)
-	      ]).
-:- use_module(rewrite_thes).
+	      ], [silent(true)]).
+:- use_module(rewrite_people).
 
 load_ontologies :-
 	rdf_attach_library(cliopatria(ontologies)),
 	rdf_load_library(dc),
 	rdf_load_library(skos),
 	rdf_load_library(rdfs),
-	rdf_load_library(owl),
-	absolute_file_name(data('rdf/am-thesaurus-schema.ttl'), VocSchema, [access(read)]),
-	rdf_load(VocSchema,[graph(thesaurus_schema)]).
+	rdf_load_library(owl).
+
 
 :- initialization			% run *after* loading this file
 	ensure_dir(cache),
@@ -42,8 +43,8 @@ ensure_dir(Dir) :-
 
 
 
-load_thesaurus:-
-        absolute_file_name(data('src/thesaurus.xml'), File,
+load_people:-
+        absolute_file_name(data('src/people.xml'), File,
 			   [ access(read)
 			   ]),
 	load(File).
@@ -54,19 +55,19 @@ load(File) :-
 			[ dialect(xml),
 			  unit(record),
 			  prefix(Prefix),
-			  graph(thesaurus)
+			  graph(people)
 			]).
 
 
-run_thesaurus:-
-	load_thesaurus,
+run_people:-
+	load_people,
 	rewrite,
-	rdf_assert(ahm:'AM_ConceptScheme', rdf:type, skos:'ConceptScheme', thesaurus),
-	rdf_assert(ahm:'AM_ConceptScheme', rdfs:label, literal('AHM thesaurus')),
+	rdf_assert(ahm:'AM_PeopleScheme',rdf:type, skos:'ConceptScheme',people),
+	rdf_assert(ahm:'AM_PeopleScheme', rdfs:label, literal('AM People thesaurus'),people),
 	save_thesaurus.
 
 save_thesaurus:-
-	absolute_file_name(data('rdf/am-thesaurus.ttl'), File,
+	absolute_file_name(data('rdf/am-people.ttl'), File,
 			   [ access(write)
 			   ]),
-	rdf_save_turtle(File,[graph(thesaurus)]).
+	rdf_save_turtle(File,[graph(people)]).

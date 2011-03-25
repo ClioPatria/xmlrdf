@@ -1,11 +1,17 @@
+NEW Issues:
+
+
+- ENS: agent in een conceptscheme? nee
+- ENS: map persons properties to RDA Group2 elements
+
+
+
+
 TODO:
 - People thesaurus: use property (Bob)
+- Thesaurus: put in other namespace (purl/vocabularies)?
+- Thesaurus: add skos_inscheme
 -----------------------------------------------------
-
-
-
-
-
 
 
 - For the schema file, I have used the old ahm-schema.ttl file, where vra is replaced by dcterms where possible. Here we use the standard vra-dcterms mapping (http://www.vraweb.org/resources/datastandards/vracore3/categories.html#type)
