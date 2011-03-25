@@ -7,11 +7,8 @@ user:file_search_path(data,       metadata('AHM')).
 :- use_module(library(semweb/rdf_db)).
 
 :- rdf_register_ns(ahm,	   'http://purl.org/collections/nl/am/').
-:- rdf_register_ns(ulan,   'http://e-culture.multimedian.nl/ns/getty/ulan#').
-:- rdf_register_ns(aatned, 'http://e-culture.multimedian.nl/ns/rkd/aatned/').
 
-:- use_module([ cliopatria(cliopatria),
-		library(xmlrdf/xmlrdf),
+:- use_module([ library(xmlrdf/xmlrdf),
 		library(semweb/rdf_cache),
 		library(semweb/rdf_library),
 		library(semweb/rdf_turtle_write)
@@ -19,7 +16,6 @@ user:file_search_path(data,       metadata('AHM')).
 :- use_module(rewrite_thes).
 
 load_ontologies :-
-	rdf_attach_library(cliopatria(ontologies)),
 	rdf_load_library(dc),
 	rdf_load_library(skos),
 	rdf_load_library(rdfs),

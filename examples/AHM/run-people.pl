@@ -7,13 +7,8 @@ user:file_search_path(data,       metadata('AHM')).
 :- load_files(library(semweb/rdf_db), [silent(true)]).
 
 :- rdf_register_ns(ahm,	   'http://purl.org/collections/nl/am/').
-:- rdf_register_ns(ulan,   'http://e-culture.multimedian.nl/ns/getty/ulan#').
-:- rdf_register_ns(aatned, 'http://e-culture.multimedian.nl/ns/rkd/aatned/').
-:- rdf_register_ns(skos,   'http://www.w3.org/2004/02/skos/core#').
-:- rdf_register_ns(foaf,   'http://xmlns.com/foaf/0.1/').
 
-:- load_files([ cliopatria(cliopatria),
-		library(xmlrdf/xmlrdf),
+:- load_files([ library(xmlrdf/xmlrdf),
 		library(semweb/rdf_cache),
 		library(semweb/rdf_library),
 		library(semweb/rdf_turtle_write)
@@ -21,7 +16,6 @@ user:file_search_path(data,       metadata('AHM')).
 :- use_module(rewrite_people).
 
 load_ontologies :-
-	rdf_attach_library(cliopatria(ontologies)),
 	rdf_load_library(dc),
 	rdf_load_library(skos),
 	rdf_load_library(rdfs),
