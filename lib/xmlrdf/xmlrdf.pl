@@ -29,7 +29,9 @@
 */
 
 :- module(xmlrdf,
-	  [ load_xml_as_rdf/2		% +Input, +Options
+	  [ load_xml_as_rdf/2,		% +Input, +Options
+	    xmldom_to_rdf/2,		% +DOM, +Options
+	    xmldom_rdf_properties/3	% +URI, +DOM, +Options
 	  ]).
 :- use_module(library(semweb/rdf_db)).
 :- use_module(library(semweb/rdfs)).
@@ -204,6 +206,39 @@ on_begin(Element, Attr, Parser) :-
 		 *	  RDF CONVERSION	*
 		 *******************************/
 
+%%	xmldom_to_rdf(+DOM, +Options) is det.
+%
+%	Convert an XML DOM into RDF  and   assert  the  RDF into the RDF
+%	store. Options:
+%
+%	    * uri(URI)
+%	    URI for the topmost element
+%	    * type(URI)
+%	    rdf:type URI for the topmost element. If provided, we assume
+%	    that the triple is already added.
+%	    * graph(+Graph)
+%	    Named graph in which to store the results.
+
+xmldom_to_rdf(DOM, Options) :-
+	make_option(Options, Record, _),
+	option_graph(Record, Graph),
+	element_uri(DOM, URI, Options),
+	(   option(type(Type), Options)
+	->  true
+	;   element_type(DOM, Type, Record),
+	    rdf_assert(URI, rdf:type, Type, Graph)
+	),
+	set_properties(URI, DOM, Record).
+
+%%	xmldom_rdf_properties(+URI, +DOM, +Options) is det.
+%
+%	Assign properties to URI from the given XML DOM element.
+
+xmldom_rdf_properties(URI, DOM, Options) :-
+	make_option(Options, Record, _),
+	set_properties(URI, DOM, Record).
+
+
 %%	convert(+Element, +Options) is det.
 
 convert(Element, Options) :-
@@ -212,6 +247,12 @@ convert(Element, Options) :-
 	element_type(Element, Type, Options),
 	rdf_assert(URI, rdf:type, Type, Graph),
 	set_properties(URI, Element, Options).
+
+element_uri(_Element, URI, Options) :-
+	option(uri(URI), Options), !.
+element_uri(Element, URI, _Options) :-
+	element_uri(Element, URI),
+	rdf_bnode(URI).
 
 element_uri(_Element, URI) :-
 	rdf_bnode(URI).
