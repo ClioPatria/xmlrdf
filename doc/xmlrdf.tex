@@ -1,0 +1,33 @@
+\documentclass[11pt]{article}
+\usepackage{times}
+\usepackage{pldoc}
+\sloppy
+\makeindex
+
+\begin{document}
+
+\title{A structured appraoch to covert XML into RDF}
+\author{Jan Wielemaker}
+
+\maketitle
+
+\begin{abstract}
+This document describes a Prolog-based toolkit that supports a
+structured approach to convert vocabularies and metadata collections
+from XML into RDF.  First, the data is translated automatically from
+XML to RDF using a generic procedure.  Next, we use a graph-rewriting
+language to translate the initial RDF into its final form.  The toolkit
+provides a web-based interface to analyse the data in all its stages.
+\end{abstract}
+
+\pagebreak
+\tableofcontents
+
+\vfill
+\vfill
+
+\newpage
+
+\input{README.tex}
+
+\end{document}
