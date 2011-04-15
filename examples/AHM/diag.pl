@@ -1,3 +1,8 @@
+:- module(ahm_diag,
+	  [ bad/1
+	  ]).
+:- use_module(library(semweb/rdf_db)).
+
 num_creators(R, N) :-
 	bagof(C, rdf(R, ahm:creator, C), Cs),
 	length(Cs, N).
