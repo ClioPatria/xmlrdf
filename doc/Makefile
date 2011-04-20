@@ -1,7 +1,6 @@
 PL=	../../../run.pl \
 	../examples/AHM/run-data.pl \
-	../lib/xmlrdf/cvt_vocabulary.pl \
-	../lib/xmlrdf/rdf_schema.pl
+	../lib/xmlrdf/cvt_vocabulary.pl
 
 all:	xmlrdf.pdf
 

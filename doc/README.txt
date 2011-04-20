@@ -221,7 +221,7 @@ It is adviced to maintain the original property- and type-names
     schemas such as Dublin Core. E.g., a creator as listed for a work in
     a museum for architecture is typically an architect and the work in
     the museum is some form of reproduction on the real physical object.
-    If we had replacd the original creator property by
+    If we had replaced the original creator property by
     =|dcterms:creator|=, this information is lost.
 
     2. It makes it much easier to relate the RDF to the original
@@ -229,19 +229,14 @@ It is adviced to maintain the original property- and type-names
     easier to reuse the result of semantic enrichment in the original
     data-source.
 
-The toolkit provides a predicate to derive the initial schema from the
-converted data using the predicate make_schema/2:
-
-    * [[make_schema/2]]
-
-After running this predicate, the schema can be downloaded from the
-target graph through the web-interface, or it can be saved using
-rdf_save_turtle/2, as in
-
-    ==
-    ?- make_schema(data, schema).
-    ?- rdf_save_turtle('schema.ttl', [graph(schema)]).
-    ==
+This implies that the converted data is normally accompagnied by a
+schema that lists the properties and types in the data and relates them
+using rdfs:subPropertyOf or rdfs:subClassOf to one or more generic
+schemas (e.g., Dublic Core). ClioPatria provides a facility to compute a
+schema for a graph from the actual data. This schema can be used as a
+starting point. To get this schema, open the ClioPatria web-interface,
+Use *|Places/Graphs|* to locate the graph and choose the option
+_|Compute a schema for this graph and *Show* the result as *Turtle*|_.
 
 
 ---++ Assign URIs to blank nodes where applicable.
