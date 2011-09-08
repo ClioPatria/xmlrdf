@@ -2,10 +2,16 @@ PL=	../../../run.pl \
 	../examples/AHM/run-data.pl \
 	../lib/xmlrdf/cvt_vocabulary.pl
 
-all:	xmlrdf.pdf
+all:	pdf html
+
+pdf:	xmlrdf.pdf
+html:	xmlrdf.html
 
 xmlrdf.pdf: xmlrdf.tex README.tex
 	pdflatex xmlrdf.tex
+
+xmlrdf.html: xmlrdf.tex README.tex
+	latex2html xmlrdf.tex
 
 README.tex: README.txt $(PL)
 	./pltotex.pl --section --text README.txt $(PL)
