@@ -318,7 +318,7 @@ expand_rule(Term0, Term) :-
 
 expand_rule((Keep \ Delete <=> Body), Name, Id,
 	    (rdf_mapping_rule(Id, Name, Graph, Actions, Options) :-
-	    	Rule)) :- !,
+		Rule)) :- !,
 	expand_body(Body, Guard, Add, Options0),
 	actions(Graph, Delete, Add, Actions),
 	(   Actions = rdf_rename(_,_,_),
@@ -329,13 +329,13 @@ expand_rule((Keep \ Delete <=> Body), Name, Id,
 	rule_body(Graph, Keep, Delete, Guard, Rule).
 expand_rule((Delete <=> Body), Name, Id,
 	    (rdf_mapping_rule(Id, Name, Graph, Actions, Options) :-
-	    	Rule)) :- !,
+		Rule)) :- !,
 	expand_body(Body, Guard, Add, Options),
 	actions(Graph, Delete, Add, Actions),
 	rule_body(Graph, true, Delete, Guard, Rule).
 expand_rule((Keep ==> Body), Name, Id,
 	    (rdf_mapping_rule(Id, Name, Graph, Actions, Options) :-
-	    	Rule)) :- !,
+		Rule)) :- !,
 	expand_body(Body, Guard, Add, Options),
 	actions(Graph, true, Add, Actions),
 	rule_body(Graph, Keep, true, Guard, Rule).
@@ -855,10 +855,10 @@ user:term_expansion(In, Out) :-
 		 *******************************/
 
 :- multifile
-	emacs_prolog_colours:term_colours/2,
-	emacs_prolog_colours:goal_colours/2,
-	emacs_prolog_colours:style/2,
-	emacs_prolog_colours:identify/2,
+	prolog_colour:term_colours/2,
+	prolog_colour:goal_colours/2,
+	prolog_colour:style/2,
+	prolog_colour:identify/2,
 	prolog:called_by/2.
 
 term_colours((_Name@@Rule),
@@ -913,14 +913,11 @@ body_colours(X>>_, redirect - [Colours, graph]) :- !,
 body_colours({_}, add_triple - [classify ]) :- !.
 body_colours(_, body).
 
-emacs_prolog_colours:term_colours(Term, Colours) :-
+prolog_colour:term_colours(Term, Colours) :-
 	term_colours(Term, Colours).
 
-:- op(990, xfx, :=).			% allow compiling without XPCE
-:- op(200, fy, @).
-
-emacs_prolog_colours:style(add_triple, style(background := '#a2ffa1')).
-emacs_prolog_colours:style(del_triple, style(background := '#ffb3b3')).
-emacs_prolog_colours:style(optional,   style(bold := @on)).
-emacs_prolog_colours:style(sequence,   style(bold := @on)).
-emacs_prolog_colours:style(graph,      style(bold := @on)).
+prolog_colour:style(add_triple, [background('#a2ffa1')]).
+prolog_colour:style(del_triple, [background('#ffb3b3')]).
+prolog_colour:style(optional,   [bold(true)]).
+prolog_colour:style(sequence,   [bold(true)]).
+prolog_colour:style(graph,      [bold(true)]).
