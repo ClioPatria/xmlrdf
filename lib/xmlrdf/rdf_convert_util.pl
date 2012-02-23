@@ -1,5 +1,6 @@
 :- module(rdf_convert_util,
 	  [ rdf_literal/1,		% @Term
+	    type_time_literal/2,	% +Literal, -TypedLiteral
 	    literal_to_id/3,		% +Literal, +NameSpace, -Id
 	    name_to_id/3,		% +Literal, +NameSpace, -Id
 	    edm_identifier/4		% +URI, +Orig, -New, NewURI
@@ -8,13 +9,17 @@
 :- use_module(library(apply)).
 
 
+:- if(\+current_predicate(rdf_literal/1)).
 %%	rdf_literal(Term) is semidet.
 %
-%	True if Term is an RDF literal
+%	True if Term is an RDF literal.
+%
+%	@tbd	Should be merged into library(semweb/rdf_db).
 
 rdf_literal(Term) :-
 	compound(Term),
 	Term = literal(_).
+:- endif.
 
 %%	name_to_id(+Literal, +NS, -ID)
 %
@@ -73,11 +78,20 @@ text_of_literal(Text, Text) :-
 	atomic(Text).
 
 text_to_id(Text, Id) :-
-	unaccent_atom(Text, T1),
+	unaccent(Text, T1),
 	atom_codes(T1, Codes),
 	maplist(map_non_id_char, Codes, Codes1),
 	normalize_underscores(Codes1, Codes2),
 	atom_codes(Id, Codes2).
+
+:- if(exists_source(library(unicode))).
+unaccent(Raw, Clean) :-
+	unicode_map(Raw, Clean, [decompose,stripmark]).
+:- else.
+unaccent(Raw, Clean) :-
+	unaccent_atom(Raw, Clean).
+:- endif.
+
 
 map_non_id_char(0'_, 0'_) :- !.
 map_non_id_char(0'-, 0'-) :- !.
@@ -100,6 +114,37 @@ normalize_underscores_2([0'_|T0], Can) :- !,
 	).
 normalize_underscores_2([H|T0], [H|T]) :-
 	normalize_underscores_2(T0, T).
+
+
+%%	type_time_literal(+Literal, -TypedLiteral) is det.
+%
+%	True when TypedLiteral is a typed version of Literal.
+
+type_time_literal(literal(Text), literal(type(Type, Text))) :-
+	atom(Text),
+	atom_codes(Text, Codes),
+	(   phrase(gYear, Codes)
+	->  rdf_equal(Type, xsd:gYear)
+	;   phrase(date, Codes)
+	->  rdf_equal(Type, xsd:date)
+	;   phrase(dateTime, Codes)
+	->  rdf_equal(Type, xsd:dateTime)
+	), !.
+type_time_literal(Literal, Literal).
+
+gYear    --> digit, digit, digit, digit.
+date     --> gYear, "-", month, "-", day.
+time     --> hour, ":", min, ( ":", sec ; [] ).
+dateTime --> date, "T", time.
+
+month --> digit(C1), digit(C2), { number_codes(M, [C1,C2]), between(1,12,M) }.
+day   --> digit(C1), digit(C2), { number_codes(D, [C1,C2]), between(1,31,D) }.
+hour  --> digit(C1), digit(C2), { number_codes(H, [C1,C2]), between(0,23,H) }.
+min   --> digit(C1), digit(C2), { number_codes(M, [C1,C2]), between(0,59,M) }.
+sec   --> digit(C1), digit(C2), { number_codes(S, [C1,C2]), between(0,59,S) }.
+
+digit    --> digit(_).
+digit(C) --> [C], { between(0'0, 0'9, C) }.
 
 
 %%	edm_identifier(URI, +Orig, +New, -NewURI)
