@@ -59,6 +59,7 @@
 	       dialect:oneof([xml,xmlns])=xmlns,
 	       graph:atom=data,
 	       prefix:atom=(-),
+	       use_schema:boolean=true,
 	       class_style:oneof(['OneTwo','oneTwo',
 				  'one_two','One_Two',keep])='OneTwo',
 	       predicate_style:oneof(['OneTwo','oneTwo',
@@ -85,6 +86,10 @@
 %
 %	    * graph(+Graph)
 %	    RDF Graph for storing the output.  Default is =data=
+%
+%	    * use_schema(+Boolean)
+%	    If =true= (default), use schema information to guide the
+%	    translation.
 %
 %	    * prefix(+Prefix)
 %	    Create a URI from an XML name by putting Prefix in front
@@ -476,7 +481,7 @@ update_schema(XMLName, Prop, Type) :-
 	).
 
 %%	mapped_property(+Subject, +XMLName,
-%%		  	-RDFProperty, -RDFType, +Options) is semidet.
+%%			-RDFProperty, -RDFType, +Options) is semidet.
 %
 %	True if XMLName is mapped  to   RDFProperty  with  the given RDF
 %	type. There are three ways  to  decide   that  we  deal  with an
@@ -493,6 +498,7 @@ update_schema(XMLName, Prop, Type) :-
 %	    translation that has a type.
 
 mapped_property(Subject, XMLName, Prop, Type, Options) :-
+	option_use_schema(Options, true),
 	rdf(Subject, rdf:type, Class),
 	(   property_map(XMLName, Class, Prop, Type, Mapped)
 	->  Mapped == true
