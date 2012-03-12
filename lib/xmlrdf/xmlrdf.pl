@@ -148,8 +148,7 @@ open_input(stream(In), In, true) :- !.
 open_input(URL, In, Cleanup) :-
 	atom(URL),
 	uri_file_name(URL, File), !,
-	open(File, read, In, [type(binary)]),
-	Cleanup = close(In).
+	open_file(File, In, Cleanup).
 open_input(URL, In, Cleanup) :-
 	atom(URL),
 	uri_components(URL, Data),
@@ -158,9 +157,16 @@ open_input(URL, In, Cleanup) :-
 	set_stream(In, file_name(URL)),
 	Cleanup = close(In).
 open_input(Spec, In, Cleanup) :-
-	absolute_file_name(Spec, Path, [access(read)]),
-	open(Path, read, In, [type(binary)]),
+	absolute_file_name(Spec, Path, [extensions([gz,'']), access(read)]),
+	open_file(Path, In, Cleanup).
+
+open_file(Path, In, Cleanup) :-
+	(   file_name_extension(_, gz, Path)
+	->  gzopen(Path, read, In, [type(binary)])
+	;   open(Path, read, In, [type(binary)])
+	),
 	Cleanup = close(In).
+
 
 %%	process(+Stream, +Options)
 
