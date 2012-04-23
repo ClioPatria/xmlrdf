@@ -101,8 +101,9 @@ rewrite_step(Module, Graph, Rule) :-
 	    rdf_statistics(triples(TC0)),
 	    statistics(cputime, T0),
 	    (	option(transaction(true), Options, true)
-	    ->	rdf_transaction(call_rewrite_rule(Id, Module, Graph, Options),
-				Rule)
+	    ->	rdf_transaction(
+		    call_rewrite_rule(Id, Module, Graph, Options),
+		    Rule)
 	    ;	call_rewrite_rule(Id, Module, Graph, Options)
 	    ),
 	    statistics(cputime, T1),
@@ -119,7 +120,19 @@ rewrite_step(Module, Graph, Rule) :-
 	;   true
 	).
 
+%%	call_rewrite_rule(+RuleID, +Module, +Graph, +Options)
+%
+%	If debug(profile(rule(RuleID))) is enabled, the execution of the
+%	rule is profiled.
+
 call_rewrite_rule(Rule, Module, Graph, Options) :-
+	debugging(profile(rule(Rule))),
+	profile(call_rewrite_rule2(Rule, Module, Graph, Options)).
+call_rewrite_rule(Rule, Module, Graph, Options) :-
+	call_rewrite_rule2(Rule, Module, Graph, Options).
+
+
+call_rewrite_rule2(Rule, Module, Graph, Options) :-
 	bnode_terms(Options, BNodes, BNodeOptions, _RestOptions),
 	BNodes \== [], !,
 	Template =.. [v,Actions|BNodes],
@@ -128,7 +141,7 @@ call_rewrite_rule(Rule, Module, Graph, Options) :-
 		Bag),
 	create_bnodes(BNodeOptions, 2, Bag, Graph),
 	call_actions(Bag).
-call_rewrite_rule(Rule, Module, Graph, Options) :-
+call_rewrite_rule2(Rule, Module, Graph, Options) :-
 	findall(Actions,
 		Module:rdf_mapping_rule(Rule, _Name, Graph, Actions, Options),
 		Goals),
