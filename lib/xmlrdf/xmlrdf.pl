@@ -76,7 +76,7 @@
 		     ]).
 
 
-%%	load_xml_as_rdf(From, Options)
+%%	load_xml_as_rdf(+From, +Options) is det.
 %
 %	Convert an XML file into `crude' RDF. From is either a filename,
 %	a  URL  (using  either  =file=  or  =http=  scheme)  or  a  term
@@ -89,7 +89,7 @@
 %	    is just one toplevel structure, this may be passed without
 %	    using a list.
 %
-%	    * dialect(Dialect)
+%	    * dialect(+Dialect)
 %	    One of =xml= or =xmlns=.  Use =xmlns= if the file contains
 %	    xmlns= attributes and XML names of the form ns:local.  If
 %	    neither is present, the file must be processed using the
@@ -123,8 +123,24 @@
 %	    * class_style(+Style)
 %	    Same as predicate_style, but used when generating a
 %	    class-name.  The default is 'OneTwo'.
+%
+%	@param	From is either a single file or a list of file names.
+%		In the latter case, the elements of the list are
+%		processed concurrently.
 
+load_xml_as_rdf(List, Options) :-
+	is_list(List), !,
+	maplist(load_command(Options), List, Commands),
+	current_prolog_flag(cpu_count, MaxJobs),
+	length(Commands, Count),
+	Jobs is min(Count, MaxJobs),
+	concurrent(Jobs, Commands, []).
 load_xml_as_rdf(From, Options) :-
+	load_xml_as_rdf_one(From, Options).
+
+load_command(Options, File, load_xml_as_rdf_one(File, Options)).
+
+load_xml_as_rdf_one(From, Options) :-
 	canonical_unit_option(Options, COptions),
 	make_option(COptions, Record, _Rest),
 	flush_name_uri_cache,
