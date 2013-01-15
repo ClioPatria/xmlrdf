@@ -65,6 +65,17 @@
 	       predicate_style:oneof(['OneTwo','oneTwo',
 				      'one_two','One_Two',keep])='oneTwo').
 
+:- predicate_options(load_xml_as_rdf/2, 2,
+		     [ unit(any),
+		       dialect(oneof([xml,xmlns])),
+		       graph(atom),
+		       use_schema(boolean),
+		       prefix(atom),
+		       class_style(oneof([oneTwo,'OneTwo',one_two,'One_Two'])),
+		       predicate_style(oneof([oneTwo,'OneTwo',one_two,'One_Two']))
+		     ]).
+
+
 %%	load_xml_as_rdf(From, Options)
 %
 %	Convert an XML file into `crude' RDF. From is either a filename,
