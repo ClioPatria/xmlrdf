@@ -71,8 +71,8 @@
 		       graph(atom),
 		       use_schema(boolean),
 		       prefix(atom),
-		       class_style(oneof([oneTwo,'OneTwo',one_two,'One_Two'])),
-		       predicate_style(oneof([oneTwo,'OneTwo',one_two,'One_Two']))
+		       class_style(oneof([oneTwo,'OneTwo',one_two,'One_Two',keep])),
+		       predicate_style(oneof([oneTwo,'OneTwo',one_two,'One_Two',keep]))
 		     ]).
 
 
