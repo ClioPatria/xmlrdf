@@ -2,6 +2,7 @@
 	  [ rdf_literal/1,		% @Term
 	    type_time_literal/2,	% +Literal, -TypedLiteral
 	    literal_to_id/3,		% +Literal, +NameSpace, -Id
+	    literal_to_id/4,		% +Literal, +NameSpace, -Id, +Options
 	    name_to_id/3,		% +Literal, +NameSpace, -Id
 	    edm_identifier/4		% +URI, +Orig, -New, NewURI
 	  ]).
@@ -49,23 +50,30 @@ name_to_id(Literal, NS, ID) :-
 %	    literal_to_id([ParentLit, '-', Literal], NS, ID)
 %	    ==
 %
+%       Options may include:
+%
+%       * accents(normalize/disable), defaults to normalize
+%       * underscores(normalize/disable), defaults to normalize
+%
 %	@tbd	Verify that the generated URI is unique!
 %	@tbd	Remove diacritics for non-iso-latin-1 text
 
-literal_to_id(Literals, NS, URI) :-
+literal_to_id(Literals, NS, URI, Options):-
 	is_list(Literals), !,
-	maplist(literal_to_id, Literals, IDs),
+	maplist(literal_to_id_nn(Options), Literals, IDs),
 	atomic_list_concat(IDs, ID),
 	rdf_current_ns(NS, Prefix),
 	atom_concat(Prefix, ID, URI).
-literal_to_id(Literal, NS, URI) :-
-	literal_to_id(Literal, ID),
+literal_to_id(Literal, NS, URI, Options) :-
+	literal_to_id_nn(Options, Literal, ID),
 	rdf_current_ns(NS, Prefix),
 	atom_concat(Prefix, ID, URI).
+literal_to_id(Literals, NS, URI) :-
+	literal_to_id(Literals, NS, URI, []).
 
-literal_to_id(Literal, ID) :-
+literal_to_id_nn(Options, Literal, ID) :-
 	text_of_literal(Literal, Text),
-	text_to_id(Text, ID).
+	text_to_id(Text, ID, Options).
 
 text_of_literal(Var, _) :-
 	var(Var), !,
@@ -77,11 +85,17 @@ text_of_literal(lang(_, Text), Text).
 text_of_literal(Text, Text) :-
 	atomic(Text).
 
-text_to_id(Text, Id) :-
-	unaccent(Text, T1),
+text_to_id(Text, Id, Options) :-
+	(   option(accents(normalize), Options, normalize)
+	->  unaccent(Text, T1)
+	;   T1 = Text
+	),
 	atom_codes(T1, Codes),
 	maplist(map_non_id_char, Codes, Codes1),
-	normalize_underscores(Codes1, Codes2),
+	(   option(underscores(normalize), Options, normalize)
+	->  normalize_underscores(Codes1, Codes2)
+	;   Codes2 = Codes1
+	),
 	atom_codes(Id, Codes2).
 
 :- if(exists_source(library(unicode))).
