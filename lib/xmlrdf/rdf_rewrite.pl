@@ -722,7 +722,11 @@ sensible_char_2(0'\n).
 %%	rdf_assert_new(+S,+P,+O,+Graph) is det.
 
 rdf_assert_new(S,P,O,Graph) :-
-	rdf(S,P,O,Graph), !.
+	(   O = literal(L),
+	    atom(L)
+	->  rdf(S,P,literal(plain(L),L),Graph)
+	;   rdf(S,P,O,Graph)
+	), !.
 rdf_assert_new(S,P,O,Graph) :-
 	rdf_assert(S,P,O,Graph).
 
@@ -733,10 +737,7 @@ rdf_assert_new(S,P,O,Graph) :-
 
 rdf_assert_if_ground(S,P,O,Graph) :-
 	nonvar(S), nonvar(P), nonvar(O), !,
-	(   rdf(S,P,O,Graph)
-	->  true
-	;   rdf_assert(S,P,O,Graph)
-	).
+	rdf_assert_new(S,P,O,Graph).
 rdf_assert_if_ground(_,_,_,_).
 
 %%	rdf_retract_if_ground(+S,+P,+O,+Graph) is det.
@@ -746,7 +747,11 @@ rdf_assert_if_ground(_,_,_,_).
 
 rdf_retract_if_ground(S,P,O,Graph) :-
 	nonvar(S), nonvar(P), nonvar(O), !,
-	rdf_retractall(S,P,O,Graph).
+	(   O = literal(L),
+	    atom(L)
+	->  rdf_retractall(S,P,literal(plain(L),L),Graph)
+	;   rdf_retractall(S,P,O,Graph)
+	).
 rdf_retract_if_ground(_,_,_,_).
 
 
