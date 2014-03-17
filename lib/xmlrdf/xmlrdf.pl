@@ -179,7 +179,7 @@ open_input(URL, In, Cleanup) :-
 open_input(URL, In, Cleanup) :-
 	atom(URL),
 	uri_components(URL, Data),
-	uri_data(scheme, Data, http), !,
+	uri_data(scheme, Data, Scheme), Scheme == http, !,
 	http_open(URL, In, []),
 	set_stream(In, file_name(URL)),
 	Cleanup = close(In).
@@ -263,9 +263,9 @@ xmldom_to_rdf(DOM, Options) :-
 	element_uri(DOM, URI, Options),
 	(   option(type(Type), Options)
 	->  true
-	;   element_type(DOM, Type, Record),
-	    rdf_assert(URI, rdf:type, Type, Graph)
+	;   element_type(DOM, Type, Record)
 	),
+	rdf_assert(URI, rdf:type, Type, Graph),
 	set_properties(URI, DOM, Record).
 
 %%	xmldom_rdf_properties(+URI, +DOM, +Options) is det.
