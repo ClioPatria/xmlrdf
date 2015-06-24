@@ -14,6 +14,7 @@ user:file_search_path(data,       metadata('AHM')).
 		library(semweb/rdf_turtle_write)
 	      ], [silent(true)]).
 :- use_module(rewrite_data).
+:- use_module(library(semweb/rdf_cache)).
 
 load_ontologies :-
 	rdf_load_library(dc),

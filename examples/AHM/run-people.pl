@@ -12,6 +12,7 @@ user:file_search_path(data, metadata('AHM')).
 % Get core libraries
 
 :- use_module(library(semweb/rdf_db)).		% Core RDF
+:- use_module(library(semweb/rdf_cache)).
 :- use_module(library(semweb/rdf_library)).	% Load RDF from library
 :- use_module(library(xmlrdf/xmlrdf)).		% XML --> RDF conversion
 :- use_module(library(semweb/rdf_turtle_write)).% Save results

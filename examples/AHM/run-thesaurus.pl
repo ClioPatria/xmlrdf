@@ -5,6 +5,7 @@
 user:file_search_path(data,       metadata('AHM')).
 
 :- use_module(library(semweb/rdf_db)).
+:- use_module(library(semweb/rdf_cache)).
 
 :- rdf_register_ns(ahm,	   'http://purl.org/collections/nl/am/').
 
